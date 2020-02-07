@@ -158,7 +158,7 @@ public class WebServer {
                             let markerFileName = "\(FileKit.projectFolder)/Cache/Marker/\(markerURLEncoded)"
                             if !fileManager.fileExists(atPath: markerFileName) {
                                 Log.info("Loading Marker: \(marker.url)")
-                                try downloadFile(from: marker.url, to: markerFileName)
+                                try downloadFile(from: marker.url, to: markerFileName, fromBackup: marker.fallbackUrl)
                                 markerHitRatioLock.lock()
                                 markerHitRatio.miss += 1
                                 markerHitRatioLock.unlock()
@@ -275,9 +275,9 @@ public class WebServer {
         response.send(html)
     }
 
-    private func downloadFile(from: String, to: String) throws {
-        guard let fromURL = URL(string: from) else {
-            Log.error("\(from) is not a valid url")
+    private func downloadFile(from: String, to: String, fromBackup: String = '') throws {
+        guard let fromURL = URL(string: from) || URL(string: fromBackup) else {
+            Log.error("\(from) or \(fromBackup) is not a valid url")
             throw RequestError.internalServerError
         }
         let toURL = URL(fileURLWithPath: to)
