@@ -275,8 +275,10 @@ public class WebServer {
         response.send(html)
     }
 
-    private func downloadFile(from: String, to: String, fromBackup: String = '') throws {
+    private func downloadFile(from: String, to: String, fromBackup: String = "NotAnUrl") throws {
+        let usedFallback = false
         guard let fromURL = URL(string: from) else {
+            usedFallback = true
             guard let fromURL = URL(string: fromBackup) else {
                 Log.error("\(from) or \(fromBackup) is not a valid url")
                 throw RequestError.internalServerError
@@ -295,8 +297,42 @@ public class WebServer {
                 }
             } else if let response = response as? HTTPURLResponse {
                 if response.statusCode == 404 {
-                    Log.info("Failed to load file. Got 404")
-                    errorToThrow = RequestError.notFound
+                    if (!usedFallback){
+                        Log.info("Failed to load file. Got 404")
+                        errorToThrow = RequestError.notFound
+                    }
+                    if let fromURL = URL(string: fromBackup){
+                        let FallbackTask = URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
+                            if let data = data {
+                                do {
+                                    try data.write(to: toURL)
+                                } catch {
+                                    Log.error("Failed to save data to \(to): \(error)")
+                                    errorToThrow = RequestError.internalServerError
+                                }
+                            } else if let response = response as? HTTPURLResponse {
+                                if response.statusCode == 404 {
+                                    Log.info("Failed to load file. Got 404")
+                                    errorToThrow = RequestError.notFound                                    
+                                } else {
+                                    Log.error("Failed to load file. Got \(response.statusCode)")
+                                    errorToThrow = RequestError.internalServerError
+                                }
+                            } else {
+                                Log.error("Failed to load file. No status code")
+                                errorToThrow = RequestError.internalServerError
+                            }
+                            semaphore.signal()
+                        }
+                        task.resume()
+                        semaphore.wait()
+                        if let error = errorToThrow {
+                            throw error
+                        }
+                    } else {
+                        Log.info("Failed to load file. Got 404")
+                        errorToThrow = RequestError.notFound
+                    }
                 } else {
                     Log.error("Failed to load file. Got \(response.statusCode)")
                     errorToThrow = RequestError.internalServerError

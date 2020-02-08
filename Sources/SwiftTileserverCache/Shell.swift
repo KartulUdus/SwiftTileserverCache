@@ -27,7 +27,7 @@ class Shell {
             task.standardInput = inputPipe
         }
         task.standardOutput = pipe
-        task.launch()
+        task.run()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         task.waitUntilExit()
         return String(data: data, encoding: String.Encoding.utf8)
@@ -45,7 +45,7 @@ class Shell {
             task.standardInput = inputPipe
         }
         task.standardError = pipe
-        task.launch()
+        task.run()
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         task.waitUntilExit()
         return String(data: data, encoding: String.Encoding.utf8)
