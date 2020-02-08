@@ -276,9 +276,11 @@ public class WebServer {
     }
 
     private func downloadFile(from: String, to: String, fromBackup: String = '') throws {
-        guard let fromURL = URL(string: from) || URL(string: fromBackup) else {
-            Log.error("\(from) or \(fromBackup) is not a valid url")
-            throw RequestError.internalServerError
+        guard let fromURL = URL(string: from) else {
+            guard let fromURL = URL(string: fromBackup) else {
+                Log.error("\(from) or \(fromBackup) is not a valid url")
+                throw RequestError.internalServerError
+            }
         }
         let toURL = URL(fileURLWithPath: to)
         let semaphore = DispatchSemaphore(value: 0)
