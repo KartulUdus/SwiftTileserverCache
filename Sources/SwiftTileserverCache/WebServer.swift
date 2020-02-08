@@ -301,17 +301,17 @@ public class WebServer {
                         Log.info("Failed to load file. Got 404")
                         errorToThrow = RequestError.notFound
                     }
-                    if let fromURL = URL(string: fromBackup){
+                    if let fromFallbackURL = URL(string: fromBackup){
                         let FallbackTask = URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
-                            if let data = data {
+                            if let fallbackData = data {
                                 do {
-                                    try data.write(to: toURL)
+                                    try fallbackData.write(to: toURL)
                                 } catch {
                                     Log.error("Failed to save data to \(to): \(error)")
                                     errorToThrow = RequestError.internalServerError
                                 }
-                            } else if let response = response as? HTTPURLResponse {
-                                if response.statusCode == 404 {
+                            } else if let fallbackResponse = response as? HTTPURLResponse {
+                                if fallbackResponse.statusCode == 404 {
                                     Log.info("Failed to load file. Got 404")
                                     errorToThrow = RequestError.notFound                                    
                                 } else {
