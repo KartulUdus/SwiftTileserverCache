@@ -22,7 +22,7 @@ public struct Marker: Codable, Hashable, Drawable {
     }
     
     enum CodingKeys: String, CodingKey {
-        case url, height, width, latitude, longitude, xOffset = "x_offset", yOffset = "y_offset"
+        case url, fallbackUrl, height, width, latitude, longitude, xOffset = "x_offset", yOffset = "y_offset"
     }
     
 }
