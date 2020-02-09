@@ -302,7 +302,7 @@ public class WebServer {
                         errorToThrow = RequestError.notFound
                     }
                     if let fromFallbackURL = URL(string: fromBackup){
-                        let FallbackTask = URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
+                        let fallbackTask = URLSession.shared.dataTask(with: fromURL) { (data, response, error) in
                             if let fallbackData = data {
                                 do {
                                     try fallbackData.write(to: toURL)
@@ -324,7 +324,7 @@ public class WebServer {
                             }
                             semaphore.signal()
                         }
-                        task.resume()
+                        fallbackTask.resume()
                         semaphore.wait()
                         if let error = errorToThrow {
                             throw error
