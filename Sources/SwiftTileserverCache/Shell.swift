@@ -17,7 +17,7 @@ class Shell {
     
     func run(errorPipe: Any?=nil, inputPipe: Any?=nil) -> String? {
         let task = Process()
-        task.launchPath = "/usr/bin/env"
+        task.executableURL = "/usr/bin/env"
         task.arguments = args
         let pipe = Pipe()
         if errorPipe != nil {
@@ -35,7 +35,7 @@ class Shell {
     
     func runError(standartPipe: Any?=nil, inputPipe: Any?=nil) -> String? {
         let task = Process()
-        task.launchPath = "/usr/bin/env"
+        task.executableURL = "/usr/bin/env"
         task.arguments = args
         let pipe = Pipe()
         if standartPipe != nil {
