@@ -276,7 +276,7 @@ public class WebServer {
     }
 
     private func downloadFile(from: String, to: String, fromBackup: String = "NotAnUrl") throws {
-        let usedFallback = false
+        var usedFallback = false
         guard let fromURL = URL(string: from) else {
             usedFallback = true
             guard let fromURL = URL(string: fromBackup) else {
